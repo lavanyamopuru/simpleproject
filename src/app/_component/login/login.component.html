@@ -1,0 +1,226 @@
+<div class="c-login">
+  <div class="c-login__container">
+      <!-- <p-growl [value]="messages" [sticky]='false' [baseZIndex]="5000"></p-growl> -->
+      <div class="c-login__info">
+          <div class="c-login__bg">
+              <div class="c-login__content">
+                  <!-- <h5 class="c-login__title">Leap<span class="-ripple">Pharma</span></h5> -->
+                  <!-- <img src="assets/img/leap_logo_big.png" alt="Leap Pharma"> -->
+              </div>
+          </div>
+      </div>
+      <div class="c-login__auth">
+          <div class="c-login__form">
+              <div class="c-login__logo -company">
+                  <img src="assets/img/himalaya_logoT.png" alt="Himalaya">
+              </div>
+              <div class="c-login__logo -app">
+                  <img src="assets/img/leap-husa-logo.png" alt="Leap">
+              </div>
+              <h5 class="c-login__url" *ngIf="environmentUrl !== ''">{{environmentUrl}}</h5>
+              <form class="c-form form-horizontal needs-validation">
+                  <div class="c-form__group">
+                      <div class="c-form__floating">
+                          <input #userNameInput type="text" class="form-control c-form__input" name="UserName"
+                              id="inputUsername" [(ngModel)]="loginData.UserName" required />
+                          <label for="inputUsername" class="c-form__lbl">User Name</label>
+                          <p-message class="input-error"
+                              *ngIf="loginData.UserName === '' && loginData.error.UserNameError != ''"
+                              severity="error" text="Please enter username">
+                          </p-message>
+                      </div>
+                  </div>
+                  <div class="c-form__group">
+                      <div class="c-form__floating">
+                          <div class="c-form__floating--inline">
+                              <div class="c-form__floating--input">
+                                  <input type="{{inputType}}" class="form-control c-form__input" name="password"
+                                      id="inputPassword" [(ngModel)]="loginData.Password" required />
+                                  <label for="inputPassword" class="c-form__lbl">Password</label>
+                              </div>
+                              <a href="javascript:void(0)" class="c-form__floating--icon"
+                                  (click)="_showPassword(loginData.Password)"><i class="{{eyeIcon}}"></i></a>
+                          </div>
+                          <p-message class="input-error"
+                              *ngIf="loginData.Password === '' && loginData.error.PasswordError != ''"
+                              severity="error" text="Please enter password">
+                          </p-message>
+                      </div>
+                  </div>
+                  <!-- <p-messages [(value)]="msgs"></p-messages> -->
+                  <div class="c-form__group -action">
+                      <button type="submit" class="btn btn-warning c-form__button"
+                          (click)="CheckUserInfo()">Login</button>
+                      <a (click)="OnClickForgotPassword()" class="-forgot-password-link">Forgot password?</a>
+                  </div>
+              </form>
+              <p class="c-login__version">{{loginVersion}}</p>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="loader-container">
+  <ng-template #customLoadingTemplate>
+      <div class="" id="loader1">
+          <div class="loading">
+              <div class="outer"></div>
+              <div class="loader_inner"></div>
+              <div class="him-logo">
+                  <img src="assets/img/loader/title.png" alt="Himalaya">
+              </div>
+          </div>
+      </div>
+  </ng-template>
+  <!-- <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }" [template]="customLoadingTemplate">
+  </ngx-loading> -->
+</div>
+
+<p-dialog [(visible)]="ShowGetOTPDialog" [modal]="true" [style]="{'width':'500px'}" [showHeader]="false"
+  [draggable]="false" [closeOnEscape]="true" [dismissableMask]="false" [responsive]="true">
+  <div class="p-dialog__content">
+      <div class="p-dialog__header">
+          <h5 class="modal-title">Get OTP Details</h5>
+      </div>
+      <div class="p-dialog__body">
+          <div class="m-form">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="form-group">
+                          <label class="control-label">User Name<span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" [(ngModel)]="ForgotPassword.LoginId"
+                              placeholder="Enter User Name">
+                          <p-message class="input-error"
+                              *ngIf="ForgotPassword.LoginId === '' && ForgotPassworderror.LoginIdError != ''"
+                              severity="error" text="Please enter valid User Name">
+                          </p-message>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- <p-growl [(value)]="messages"></p-growl> -->
+      </div>
+  </div>
+  <p-footer>
+      <div class="p-dialog__footer">
+          <button type="button" class="btn btn-sm btn-primary" (click)="GetOTP()">Get OTP</button>
+          <button type="button" class="btn btn-sm btn-secondary" (click)="CloseModel()">Cancel</button>
+      </div>
+  </p-footer>
+</p-dialog>
+<p-dialog [(visible)]="ShowSubmitOTPDialog" [modal]="true" [style]="{'width':'500px'}" [showHeader]="false"
+  [draggable]="false" [closeOnEscape]="true" [dismissableMask]="false" [responsive]="true">
+  <div class="p-dialog__content">
+      <div class="p-dialog__header">
+          <h5 class="modal-title">Submit OTP Details</h5>
+      </div>
+      <div class="p-dialog__body">
+          <div class="m-form">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="form-group">
+                          <label class="control-label">OTP<span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" (input)="OnKeyUpOTP($event)" maxlength="4"
+                              [(ngModel)]="ForgotPassword.OTP" placeholder="Enter Sent OTP here"
+                              autocomplete="new-password">
+                          <p-message class="input-error"
+                              *ngIf="ForgotPassword.OTP === '' && ForgotPassworderror.OTPError != ''" severity="error"
+                              text="Please enter Valid OTP">
+                          </p-message>
+                          <p-message class="input-error"
+                              *ngIf="ForgotPassword.OTP != '' && ForgotPassword.OTP !=OTPDetails.OTP" severity="error"
+                              text="Please enter valid OTP">
+                          </p-message>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- <p-growl [(value)]="messages"></p-growl> -->
+      </div>
+  </div>
+  <p-footer>
+      <div class="p-dialog__footer">
+          <button type="button" class="btn btn-sm btn-primary" (click)="SubmitOTP()">Submit OTP</button>
+          <button type="button" class="btn btn-sm btn-secondary" (click)="CloseModel()">Cancel</button>
+      </div>
+  </p-footer>
+</p-dialog>
+<p-dialog [(visible)]="ShowChangePasswordDialog" [modal]="true" [style]="{'width':'500px'}" [showHeader]="false"
+  [draggable]="false" [closeOnEscape]="true" [dismissableMask]="false" [responsive]="true">
+  <div class="p-dialog__content">
+      <div class="p-dialog__header">
+          <h5 class="modal-title">Change Password</h5>
+      </div>
+      <div class="p-dialog__body">
+          <div class="m-form">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="form-group">
+                          <label class="control-label">New Password<span class="text-danger">*</span></label>
+                          <div class="m-form__group--inline">
+                              <div class="m-form__group--input">
+                                  <input type="{{inputType}}" class="form-control"
+                                      [(ngModel)]="ForgotPassword.Password" placeholder="Enter New Password"
+                                      autocomplete="new-password">
+                              </div>
+                              <a href="javascript:void(0)" class="m-form__group--icon"
+                                  (click)="_showPassword(ForgotPassword.Password)"><i class="{{eyeIcon}}"></i></a>
+                          </div>
+                          <p-message class="input-error"
+                              *ngIf="ForgotPassword.Password === '' && ForgotPassworderror.newPasswordError != ''"
+                              severity="error" text="Please enter new password">
+                          </p-message>
+                      </div>
+                  </div>
+                  <div class="col-md-12">
+                      <div class="form-group">
+                          <label class="control-label">Confirm Password<span class="text-danger">*</span></label>
+                          <div class="m-form__group--inline">
+                              <div class="m-form__group--input">
+                                  <input type="{{confirmPasswordInputType}}" class="form-control"
+                                      [(ngModel)]="ForgotPassword.ConfirmPassword"
+                                      placeholder="Enter Confirm Password">
+                              </div>
+                              <a href="javascript:void(0)" class="m-form__group--icon"
+                                  (click)="_showConfirmPassword(ForgotPassword.ConfirmPassword)"><i
+                                      class="{{confirmEyeIcon}}"></i></a>
+                          </div>
+                          <p-message class="input-error"
+                              *ngIf="ForgotPassword.ConfirmPassword === '' && ForgotPassworderror.confirmPasswordError != ''"
+                              severity="error" text="Please enter confirm password">
+                          </p-message>
+                          <p-message class="input-error"
+                              *ngIf="ForgotPassword.ConfirmPassword != '' && ForgotPassword.Password != ForgotPassword.ConfirmPassword"
+                              severity="error" text="New password and confirm password must match">
+                          </p-message>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- <p-growl [(value)]="messages"></p-growl> -->
+      </div>
+  </div>
+  <p-footer>
+      <div class="p-dialog__footer">
+          <button type="button" class="btn btn-sm btn-primary" (click)="ChangePassword()">Save</button>
+          <button type="button" class="btn btn-sm btn-secondary" (click)="CloseModel()">Cancel</button>
+      </div>
+  </p-footer>
+</p-dialog>
+
+<p-dialog [(visible)]="showSuccessDialog" [modal]="true" [style]="{'width':'500px'}" [showHeader]="false"
+  [draggable]="false" [closeOnEscape]="true" [dismissableMask]="true" [responsive]="true">
+  <div class="p-dialog__content">
+      <div class="p-dialog__header">
+          <h5 class="modal-title">Alert Dialog</h5>
+      </div>
+      <div class="p-dialog__body">
+          <h5 class="p-dialog__confirm--lbl">{{successMessage}}</h5>
+      </div>
+  </div>
+  <p-footer>
+      <div class="p-dialog__footer">
+          <button type="button" class="btn btn-sm btn-primary" (click)="closeSuccessModal()">Ok</button>
+      </div>
+  </p-footer>
+</p-dialog>
